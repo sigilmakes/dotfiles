@@ -21,7 +21,7 @@
 
         # --- Hardware modules ---
         ../../modules/hardware/gpu-amd.nix  # AMD GPU (RADV + AMDVLK + Mesa)
-        # ../../modules/hardware/rocm.nix     # ROCm compute (llama.cpp, ML/AI) — disabled until nix-strix-halo packages are verified
+        # ../../modules/hardware/rocm.nix     # ROCm compute (llama.cpp, ML/AI) + rocm-smi for btop GPU monitoring
         ../../modules/hardware/bluetooth.nix # Bluetooth + Blueman
 
         # --- Desktop modules ---

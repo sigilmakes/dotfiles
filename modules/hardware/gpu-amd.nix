@@ -42,13 +42,12 @@
     boot.extraModprobeConfig = ''
         # GTT: allow GPU to use up to 120GB of system memory
         options ttm pages_limit=31457280
-        # Legacy compat (deprecated but some tools still read it)
-        options amdgpu gttsize=122800
     '';
 
     # --- Graphics stack ---
     hardware.graphics = {
         enable = true;
+        enable32Bit = true;  # 32-bit Vulkan/OpenGL for Steam, Wine, Proton
 
         extraPackages = with pkgs; [
             # Mesa — OpenGL (radeonsi) + Vulkan (RADV) drivers
@@ -68,6 +67,10 @@
     environment.variables = {
         LIBVA_DRIVER_NAME = "radeonsi";
     };
+
+    # --- GPU monitoring ---
+    # rocm-smi CLI for ad-hoc GPU diagnostics (usage, temp, power, clocks)
+    environment.systemPackages = [ pkgs.rocmPackages.rocm-smi ];
 
     # --- Diagnostic commands ---
     # After rebuilding, verify everything works:

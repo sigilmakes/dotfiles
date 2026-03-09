@@ -9,11 +9,11 @@
 # compute; ROCm is for PyTorch, llama.cpp (fast pp), ComfyUI, etc.
 #
 # Usage:
-#   llama-cpp-gfx1151-rocwmma  — llama.cpp with ROCm + rocWMMA (fastest pp)
-#   llama-cpp-gfx1151          — llama.cpp with ROCm (no rocWMMA)
+#   llamacpp-rocm-gfx1151-rocwmma  — llama.cpp with ROCm + rocWMMA (fastest pp)
+#   llamacpp-rocm-gfx1151          — llama.cpp with ROCm (no rocWMMA)
 #
 # For best LLM performance:
-#   ROCBLAS_USE_HIPBLASLT=1 llama-cpp-gfx1151-rocwmma \
+#   ROCBLAS_USE_HIPBLASLT=1 llamacpp-rocm-gfx1151-rocwmma \
 #     --mmap 0 --ngl 99 -m model.gguf
 #
 # Reference: https://strixhalo.wiki/AI/llamacpp-with-ROCm
@@ -28,9 +28,19 @@
     environment.systemPackages = [
         # llama.cpp with ROCm + rocWMMA — fastest for Strix Halo
         # rocWMMA gives ~2x prefill speed vs Vulkan
-        pkgs.llama-cpp-gfx1151-rocwmma
+        pkgs.llamacpp-rocm.gfx1151-rocwmma
 
         # Plain ROCm build as fallback
-        pkgs.llama-cpp-gfx1151
+        pkgs.llamacpp-rocm.gfx1151
+
+        # ROCm SMI — GPU monitoring library + CLI.
+        # btop dynamically loads librocm_smi64.so for AMD GPU stats.
+        pkgs.rocmPackages.rocm-smi
+    ];
+
+    # btop hardcodes /opt/rocm/lib/librocm_smi64.so for AMD GPU monitoring.
+    # Create the expected path as a symlink to the nix store.
+    systemd.tmpfiles.rules = [
+        "L+ /opt/rocm/lib - - - - ${pkgs.rocmPackages.rocm-smi}/lib"
     ];
 }

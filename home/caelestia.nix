@@ -193,7 +193,7 @@ let
             weatherLocation = "";
             useFahrenheit = false;
             useTwelveHourClock = false;
-            gpuType = "amd";
+            gpuType = "";  # auto-detect: "GENERIC" for AMD (reads gpu_busy_percent from sysfs)
             audioIncrement = 0.1;
             brightnessIncrement = 0.1;
             maxVolume = 1.0;

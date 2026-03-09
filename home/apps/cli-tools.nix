@@ -10,7 +10,7 @@
     home.packages = with pkgs; [
         # --- System monitoring ---
         fastfetch                  # System info fetch (alias: fetch)
-        btop                       # TUI process monitor (referenced by sysmonlaunch.sh)
+        (btop.override { rocmSupport = true; })  # TUI process monitor with AMD GPU monitoring
 
         # --- Shell tools ---
         bat                        # Cat with syntax highlighting (PAGER=bat)
