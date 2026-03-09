@@ -85,4 +85,10 @@
     # Defines how kitty handles file opens (e.g. from `kitten open`).
     # Text files open in micro, images display with icat.
     xdg.configFile."kitty/open-actions.conf".source = ./kitty/open-actions.conf;
+
+    # --- SSH kitten config ---
+    # Overrides shell_integration for remote hosts so kittens (icat, transfer,
+    # etc.) work over `kitten ssh`. Without this, the remote shell inherits
+    # no-rc from kitty.conf and never gets integration set up.
+    xdg.configFile."kitty/ssh.conf".source = ./kitty/ssh.conf;
 }
