@@ -1,0 +1,14 @@
+[{
+    "Name": "mdfried",
+    "Description": "Preview markdown files with mdfried",
+    "Website": "https://github.com/benjajaja/mdfried",
+    "Tags": ["markdown", "preview"],
+    "Versions": [
+        {
+            "Version": "0.1.0",
+            "Require": {
+                "micro": ">=2.0.0"
+            }
+        }
+    ]
+}]

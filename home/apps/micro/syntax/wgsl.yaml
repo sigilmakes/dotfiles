@@ -1,0 +1,57 @@
+filetype: wgsl
+
+detect:
+    filename: "\\.wgsl$"
+
+rules:
+    # Attributes
+    - type: "brightgreen"
+      regex: "@(vertex|fragment|compute|binding|group|location|builtin|workgroup_size|id|align|size|interpolate|invariant|diagnostic|must_use|const)"
+
+    # Keywords
+    - statement: "\\b(fn|var|let|const|return|if|else|for|while|loop|break|continue|switch|case|default|struct|alias|override|diagnostic|enable|requires|const_assert|discard|continuing|fallthrough)\\b"
+
+    # Boolean literals
+    - constant.bool: "\\b(true|false)\\b"
+
+    # Scalar types
+    - type: "\\b(bool|i32|u32|f32|f16)\\b"
+
+    # Vector and matrix types
+    - type: "\\b(vec[234](i|u|f|h)?|mat[234]x[234](f|h)?)\\b"
+    - type: "\\b(vec[234]<[^>]+>|mat[234]x[234]<[^>]+>)\\b"
+
+    # Other types
+    - type: "\\b(array|ptr|sampler|sampler_comparison|atomic)\\b"
+
+    # Texture types
+    - type: "\\b(texture_(1d|2d|2d_array|3d|cube|cube_array|multisampled_2d|storage_1d|storage_2d|storage_2d_array|storage_3d|depth_2d|depth_2d_array|depth_cube|depth_cube_array|depth_multisampled_2d|external))\\b"
+
+    # Address spaces
+    - type.keyword: "\\b(function|private|workgroup|uniform|storage)\\b"
+
+    # Access modes
+    - type.keyword: "\\b(read|write|read_write)\\b"
+
+    # Builtin values
+    - constant: "\\b(vertex_index|instance_index|position|front_facing|frag_depth|local_invocation_id|local_invocation_index|global_invocation_id|workgroup_id|num_workgroups|sample_index|sample_mask)\\b"
+
+    # Numeric literals
+    - constant.number: "\\b0[xX][0-9a-fA-F]+[iu]?\\b"
+    - constant.number: "\\b[0-9]+\\.[0-9]*([eE][+-]?[0-9]+)?[fh]?\\b"
+    - constant.number: "\\b\\.[0-9]+([eE][+-]?[0-9]+)?[fh]?\\b"
+    - constant.number: "\\b[0-9]+[eE][+-]?[0-9]+[fh]?\\b"
+    - constant.number: "\\b[0-9]+[iufh]\\b"
+    - constant.number: "\\b[0-9]+\\b"
+
+    # Line comments
+    - comment:
+        start: "//"
+        end: "$"
+        rules: []
+
+    # Block comments
+    - comment:
+        start: "/\\*"
+        end: "\\*/"
+        rules: []

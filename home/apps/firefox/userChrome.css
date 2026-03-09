@@ -1,0 +1,85 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * Firefox userChrome.css — Sidebery tree-style tabs
+ *
+ * Hides the native tab bar and titlebar, configures sidebar widths
+ * for Sidebery / Bookmarks / History panels.
+ *
+ * Requires:
+ *   - Sidebery extension (synced via Firefox account)
+ *   - toolkit.legacyUserProfileCustomizations.stylesheets = true
+ *     (set in firefox.nix via about:config)
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Sidebar ─────────────────────────────────────────────────────── */
+
+#sidebar-box #sidebar-header {
+  display: none !important;
+}
+
+/* Base sidebar behavior */
+#sidebar-box {
+  transition: width 120ms ease-out;
+  min-width: 220px;
+  max-width: 600px;
+}
+
+/* Sidebery */
+#sidebar-box[sidebarcommand="_3c078156-979c-498b-8990-85f7987dd929_-sidebar-action"] {
+  width: 220px !important;
+}
+
+/* Bookmarks */
+#sidebar-box[sidebarcommand="viewBookmarksSidebar"] {
+  width: 280px !important;
+}
+
+/* History */
+#sidebar-box[sidebarcommand="viewHistorySidebar"] {
+  width: 300px !important;
+}
+
+/* ─── Hide native tab bar + titlebar ──────────────────────────────── */
+
+#titlebar {
+  visibility: collapse;
+}
+#TabsToolbar {
+    visibility: collapse;
+}
+
+/* Position window controls */
+#TabsToolbar .titlebar-buttonbox-container {
+  display: block !important;
+  position: absolute;
+  visibility: collapse;
+}
+
+/* Reposition close/maximize/minimize for "normal" toolbar density */
+/* When UI density is "normal", uidensity attribute is undefined   */
+:root:not([uidensity]) #TabsToolbar .titlebar-buttonbox-container {
+  margin-left: 12px;
+  margin-top: 12px;
+}
+
+/* Reposition for "compact" toolbar density */
+:root[uidensity="compact"] #TabsToolbar .titlebar-buttonbox-container {
+  margin-left: 10px;
+  margin-top: 9px;
+}
+
+#TabsToolbar .titlebar-buttonbox.titlebar-color {
+  margin-left: 0px !important;
+}
+
+/* ─── Nav bar padding ─────────────────────────────────────────────── */
+
+/* Make room for window controls (only when not fullscreen) */
+#main-window:not([inFullscreen]) #nav-bar {
+  padding: 0px 0px 0px 0px !important;
+}
+
+/* ─── Misc ────────────────────────────────────────────────────────── */
+
+:root {
+  --border-radius-medium: var(--border-radius-small, 4px) !important;
+}

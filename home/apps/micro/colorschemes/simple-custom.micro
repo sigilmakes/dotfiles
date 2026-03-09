@@ -1,0 +1,4 @@
+include "simple"
+
+# Tone down TODO/FIXME/XXX - just use comment color instead of bold yellow
+color-link todo "243"
