@@ -47,6 +47,11 @@
     # Hostname for this machine — used by networking, Avahi, etc.
     networking.hostName = "gaia";
 
+    # gpu-screen-recorder — used by caelestia for screen recording.
+    # The NixOS module gives gsr-kms-server the right capabilities
+    # so recording works without sudo.
+    programs.gpu-screen-recorder.enable = true;
+
     # --- Nix settings ---
     # Enable flakes and the modern nix CLI
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
