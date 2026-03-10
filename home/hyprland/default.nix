@@ -144,9 +144,30 @@
 
         # Machine-specific source line is in keybindings.nix extraConfig
         # (must come before the submap block).
+        # extraConfig is appended after settings, so source + group ordering is correct.
         extraConfig = ''
             # Caelestia colour scheme — provides $primary, $surface, etc.
             source = ~/.config/hypr/scheme/current.conf
+
+            # Group bar — colours from caelestia scheme variables above.
+            # Rubik font (caelestia default sans) at readable size.
+            group {
+                col.border_active = rgb($inversePrimary)
+                col.border_inactive = rgb($surfaceVariant)
+
+                groupbar {
+                    enabled = true
+                    font_family = Rubik
+                    font_size = 11
+                    height = 24
+                    render_titles = true
+                    gradients = true
+                    gradient_rounding = 8
+                    col.active = rgb($primaryContainer)
+                    col.inactive = rgb($surfaceContainerHigh)
+                    text_color = rgb($onSurface)
+                }
+            }
         '';
     };
 }

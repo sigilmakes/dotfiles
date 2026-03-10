@@ -9,27 +9,6 @@
 {
     wayland.windowManager.hyprland.settings = {
 
-        # --- Group bar ---
-        # Colours from caelestia scheme (sourced in extraConfig).
-        # Uses Rubik font (caelestia's default sans) at readable size.
-        group = {
-            "col.border_active" = "rgb($inversePrimary)";
-            "col.border_inactive" = "rgb($surfaceVariant)";
-
-            groupbar = {
-                enabled = true;
-                font_family = "Rubik";
-                font_size = 11;
-                height = 24;
-                render_titles = true;
-                gradients = true;
-                gradient_rounding = 8;
-                "col.active" = "rgb($primaryContainer)";
-                "col.inactive" = "rgb($surfaceContainerHigh)";
-                text_color = "rgb($onSurface)";
-            };
-        };
-
         # --- Layout ---
         dwindle = {
             pseudotile = true;
