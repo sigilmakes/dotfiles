@@ -3,6 +3,8 @@
 # push-to-talk.sh             — whisper-cpp voice transcription (bound in gaia.conf)
 # aiassistant.sh              — launch AI assistant in kitty terminal
 # dontkillsteam.sh            — close window, but minimize Steam instead of killing it
+# dualsense.sh                — DualSense controller config menu (triggers, touchpad)
+# windowgroup.sh              — toggle focused window in/out of a group
 
 
 { config, pkgs, lib, ... }:
@@ -20,6 +22,8 @@ let
         whisper-cpp-vulkan
         xdotool
         hyprland
+        fuzzel
+        dualsensectl
     ];
 
     scripts = pkgs.stdenv.mkDerivation {

@@ -5,7 +5,7 @@
 # normally inside that submap — only the shell-interaction binds changed.
 #
 # WHAT CHANGED vs the old config:
-#   - Super tap opens caelestia launcher (replaces Super+A → rofi)
+#   - Super tap AND Super+A open caelestia launcher (was Super+A → rofi)
 #   - Super+L → caelestia lock (was swaylock — same key)
 #   - Super+Shift+L → caelestia session menu (was logoutlaunch.sh — same key)
 #   - Screenshots route through caelestia (same keys: P, Shift+P, Alt+P, Print)
@@ -17,7 +17,10 @@
 # WHAT'S THE SAME:
 #   - All window actions (close, float, fullscreen, pin, focus, split, groups)
 #   - All workspace binds (Super+1-0, Shift+1-0, Alt+1-0, Ctrl+arrows, etc.)
-#   - All app launchers (Return, E, F, D, C, X)
+#   - All app launchers (Return, E, F, D, C)
+#   - Super+X → dualsense.sh (was quicklaunch2)
+#   - Super+R → caelestia record (was wallbash toggle)
+#   - Super+Shift+T → windowgroup.sh (restored)
 #   - Resize (Super+Shift+Arrows), move (Super+Shift+Ctrl+Arrows)
 #   - Mouse bindings, quake-style terminals
 #   - Group navigation (Super+[, Super+])
@@ -55,6 +58,9 @@
         bindin = Super, mouse_up, global, caelestia:launcherInterrupt
         bindin = Super, mouse_down, global, caelestia:launcherInterrupt
 
+        # --- Caelestia launcher (also on Super+A) ---
+        bind = $mainMod, A, global, caelestia:launcher
+
         # --- Caelestia shell panels ---
         bind = $mainMod, L, global, caelestia:lock
         bind = $mainMod SHIFT, L, global, caelestia:session
@@ -77,9 +83,9 @@
         bind = $mainMod ALT, P, global, caelestia:screenshot
         bindl = , Print, exec, caelestia screenshot
 
-        # --- Recording (new — caelestia feature) ---
-        bind = $mainMod ALT, R, exec, caelestia record -s
-        bind = Ctrl+Alt, R, exec, caelestia record
+        # --- Recording ---
+        bind = $mainMod, R, exec, caelestia record -s
+        bind = $mainMod SHIFT, R, exec, caelestia record
 
         # --- Kill / restart shell ---
         bindr = Ctrl+$mainMod+Shift, R, exec, qs -c caelestia kill
@@ -108,10 +114,11 @@
         bind = ALT, Tab, movefocus, d
 
         # Split
-        bind = $mainMod, J, togglesplit
+        bind = $mainMod, J, layoutmsg, togglesplit
 
         # Window grouping
         bind = $mainMod, T, togglegroup,
+        bind = $mainMod SHIFT, T, exec, windowgroup.sh
         binde = $mainMod, code:34, changegroupactive, b
         binde = $mainMod, code:35, changegroupactive, f
 
@@ -212,6 +219,9 @@
         # Quake-style drop-down windows
         bind = $mainMod SHIFT, Return, exec, hyprctl dispatch exec "[float on; size 60% 60%; center on] $terminal"
         bind = $mainMod SHIFT, E, exec, hyprctl dispatch exec "[float on; size 60% 60%; center on] $fileExplorer"
+
+        # DualSense controller config
+        bind = $mainMod, X, exec, dualsense.sh
 
         # Pass-through for OBS
         bind = $mainMod, code:63, pass, class:^(com.obsproject.Studio)$
