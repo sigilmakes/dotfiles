@@ -157,8 +157,8 @@
 
                 groupbar {
                     enabled = true
-                    font_family = Rubik
-                    font_size = 11
+                    font_family = CaskaydiaCove Nerd Font Mono
+                    font_size = 9
                     height = 24
                     render_titles = true
                     gradients = true
