@@ -41,6 +41,11 @@
         groff                      # Document formatter (autotex: blank PDF generation)
     ];
 
+    # --- fastfetch config ---
+    # Uses kitty image protocol to display ~/.face as the logo.
+    # Box-drawing key labels with nerd font icons.
+    xdg.configFile."fastfetch/config.jsonc".source = ./fastfetch/config.jsonc;
+
     # --- btop config ---
     # Uses TTY color theme with transparent background so terminal colors
     # show through. Braille graph symbols, proc tree view by default.
