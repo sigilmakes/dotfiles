@@ -279,7 +279,7 @@ async def run_tray(loop: asyncio.AbstractEventLoop):
 
         @dbus_property(PropertyAccess.READ)
         def ToolTip(self) -> '(sa(iiay)ss)':
-            return ("", [], "Night Mode", self._tooltip_body)
+            return ["", [], "Night Mode", self._tooltip_body]
 
         @dbus_property(PropertyAccess.READ)
         def ItemIsMenu(self) -> 'b':
