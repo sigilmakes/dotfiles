@@ -231,7 +231,7 @@ def notify(msg: str) -> None:
 async def run_tray(loop: asyncio.AbstractEventLoop):
     """Register a StatusNotifierItem on the session D-Bus."""
     from dbus_next.aio import MessageBus
-    from dbus_next.service import ServiceInterface, method, dbus_property, signal
+    from dbus_next.service import ServiceInterface, method, dbus_property, signal as dbus_signal
     from dbus_next.constants import PropertyAccess
     from dbus_next import Variant, BusType
 
@@ -338,15 +338,15 @@ async def run_tray(loop: asyncio.AbstractEventLoop):
 
         # --- Signals ---
 
-        @signal()
+        @dbus_signal()
         def NewIcon(self):
             pass
 
-        @signal()
+        @dbus_signal()
         def NewStatus(self, status: 's'):
             pass
 
-        @signal()
+        @dbus_signal()
         def NewToolTip(self):
             pass
 
