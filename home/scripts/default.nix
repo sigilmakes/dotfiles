@@ -28,6 +28,9 @@ let
         dualsensectl
     ];
 
+    # Python with dbus-next for nightmode tray icon
+    nightmodePython = pkgs.python3.withPackages (ps: [ ps.dbus-next ]);
+
     scripts = pkgs.stdenv.mkDerivation {
         pname = "gaia-scripts";
         version = "0.1.0";
@@ -53,6 +56,8 @@ let
                     --prefix PATH : "${lib.makeBinPath runtimeDeps}"
             done
             for script in $out/bin/*.py; do
+                substituteInPlace "$script" \
+                    --replace-quiet "#!/usr/bin/env python3" "#!${nightmodePython}/bin/python3"
                 wrapProgram "$script" \
                     --prefix PATH : "${lib.makeBinPath runtimeDeps}"
             done

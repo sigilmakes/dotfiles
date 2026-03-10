@@ -57,10 +57,7 @@
         bindin = Super, mouse:277, global, caelestia:launcherInterrupt
         bindin = Super, mouse_up, global, caelestia:launcherInterrupt
         bindin = Super, mouse_down, global, caelestia:launcherInterrupt
-
-        # --- Caelestia launcher (also on Super+A) ---
-        bind = $mainMod, A, global, caelestia:launcher
-
+        
         # --- Caelestia shell panels ---
         bind = $mainMod, L, global, caelestia:lock
         bind = $mainMod SHIFT, L, global, caelestia:session
@@ -238,8 +235,8 @@
         # Keyboard layout switch
         bind = $mainMod, Space, exec, hyprctl switchxkblayout all next
 
-        # Notification sidebar toggle (was swaync)
-        bind = $mainMod, slash, exec, caelestia shell drawers toggle sidebar
+        # Notification sidebar toggle
+        bind = $mainMod, slash, global, caelestia:sidebar
 
         # Night mode toggle (hyprsunset — reset to profile / force identity)
         bind = $mainMod, N, exec, nightmode.sh

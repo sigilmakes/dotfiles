@@ -2,27 +2,28 @@
 """
 Automatic night mode daemon for hyprsunset.
 
-Calculates sunrise/sunset for Warrington (53.39°N, 2.60°W) using the
-NOAA solar position algorithm, then smoothly interpolates screen colour
-temperature between day and night across a configurable transition
-window around each event.
+Calculates sunrise/sunset using the NOAA solar position algorithm,
+then smoothly interpolates screen colour temperature between day and
+night across a configurable transition window.
 
-Runs as a background loop, updating hyprsunset via IPC every 30 seconds.
+Features:
+  - Location-aware sunrise/sunset (default: Warrington, UK)
+  - Smooth temperature transitions via hyprsunset IPC
+  - SIGUSR1 toggle (Super+N keybind)
+  - System tray icon via StatusNotifierItem (D-Bus)
+  - User-editable config at ~/.config/nightmode/config
 
-Toggle: send SIGUSR1 to force night mode on/off. When forced off, the
-daemon stops updating until toggled again (or until the next sunrise,
-which auto-re-enables).
-
-Config: ~/.config/nightmode/config (optional, created on first run).
+Config: ~/.config/nightmode/config (created on first run)
+Toggle: send SIGUSR1 or click the tray icon
 """
 
+import asyncio
 import configparser
 import math
 import os
 import signal
 import subprocess
 import sys
-import time as time_mod
 from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 
@@ -40,6 +41,7 @@ DEFAULTS = {
 forced_off = False
 last_temp = None
 config = {}
+tray = None  # set when tray is running
 
 
 # =====================================================================
@@ -170,9 +172,7 @@ def _time_to_minutes(t: time) -> float:
 def calculate_temperature(now: datetime, cfg: dict) -> int:
     """
     Calculate the target colour temperature for the current time.
-
-    Transitions linearly over transition_minutes either side of
-    sunrise and sunset.
+    Transitions linearly over transition_minutes either side of sunrise/sunset.
     """
     sunrise, sunset = _sun_calc(now, cfg["latitude"], cfg["longitude"])
     now_m = _time_to_minutes(now.time())
@@ -225,11 +225,183 @@ def notify(msg: str) -> None:
 
 
 # =====================================================================
-#  Signal handler for toggle
+#  StatusNotifierItem (system tray icon)
 # =====================================================================
 
-def handle_toggle(signum, frame):
-    """SIGUSR1 toggles forced-off state. Applies immediately."""
+async def run_tray(loop: asyncio.AbstractEventLoop):
+    """Register a StatusNotifierItem on the session D-Bus."""
+    from dbus_next.aio import MessageBus
+    from dbus_next.service import ServiceInterface, method, dbus_property, signal
+    from dbus_next.constants import PropertyAccess
+    from dbus_next import Variant, BusType
+
+    SERVICE_NAME = "org.kde.StatusNotifierItem-nightmode-{pid}".format(pid=os.getpid())
+    OBJECT_PATH = "/StatusNotifierItem"
+    WATCHER_BUS = "org.kde.StatusNotifierWatcher"
+    WATCHER_PATH = "/StatusNotifierWatcher"
+
+    class StatusNotifierItem(ServiceInterface):
+        def __init__(self):
+            super().__init__("org.kde.StatusNotifierItem")
+            self._icon = "weather-clear-night"
+            self._status = "Active"
+            self._tooltip_body = ""
+
+        def update_state(self, active: bool, tooltip: str):
+            self._icon = "weather-clear-night" if active else "weather-clear"
+            self._status = "Active" if active else "Passive"
+            self._tooltip_body = tooltip
+            self.NewIcon()
+            self.NewStatus(self._status)
+            self.NewToolTip()
+
+        # --- Properties ---
+
+        @dbus_property(PropertyAccess.READ)
+        def Category(self) -> 's':
+            return "SystemServices"
+
+        @dbus_property(PropertyAccess.READ)
+        def Id(self) -> 's':
+            return "nightmode"
+
+        @dbus_property(PropertyAccess.READ)
+        def Title(self) -> 's':
+            return "Night Mode"
+
+        @dbus_property(PropertyAccess.READ)
+        def Status(self) -> 's':
+            return self._status
+
+        @dbus_property(PropertyAccess.READ)
+        def IconName(self) -> 's':
+            return self._icon
+
+        @dbus_property(PropertyAccess.READ)
+        def ToolTip(self) -> '(sa(iiay)ss)':
+            return ("", [], "Night Mode", self._tooltip_body)
+
+        @dbus_property(PropertyAccess.READ)
+        def ItemIsMenu(self) -> 'b':
+            return False
+
+        @dbus_property(PropertyAccess.READ)
+        def WindowId(self) -> 'i':
+            return 0
+
+        @dbus_property(PropertyAccess.READ)
+        def IconThemePath(self) -> 's':
+            return ""
+
+        @dbus_property(PropertyAccess.READ)
+        def Menu(self) -> 'o':
+            return "/NO_DBUSMENU"
+
+        @dbus_property(PropertyAccess.READ)
+        def AttentionIconName(self) -> 's':
+            return ""
+
+        @dbus_property(PropertyAccess.READ)
+        def OverlayIconName(self) -> 's':
+            return ""
+
+        @dbus_property(PropertyAccess.READ)
+        def IconPixmap(self) -> 'a(iiay)':
+            return []
+
+        @dbus_property(PropertyAccess.READ)
+        def AttentionIconPixmap(self) -> 'a(iiay)':
+            return []
+
+        @dbus_property(PropertyAccess.READ)
+        def OverlayIconPixmap(self) -> 'a(iiay)':
+            return []
+
+        # --- Methods ---
+
+        @method()
+        def Activate(self, x: 'i', y: 'i'):
+            """Called when the tray icon is clicked."""
+            os.kill(os.getpid(), signal.SIGUSR1)
+
+        @method()
+        def SecondaryActivate(self, x: 'i', y: 'i'):
+            pass
+
+        @method()
+        def Scroll(self, delta: 'i', orientation: 's'):
+            pass
+
+        @method()
+        def ContextMenu(self, x: 'i', y: 'i'):
+            pass
+
+        # --- Signals ---
+
+        @signal()
+        def NewIcon(self):
+            pass
+
+        @signal()
+        def NewStatus(self, status: 's'):
+            pass
+
+        @signal()
+        def NewToolTip(self):
+            pass
+
+    try:
+        bus = await MessageBus(bus_type=BusType.SESSION).connect()
+
+        item = StatusNotifierItem()
+        bus.export(OBJECT_PATH, item)
+        await bus.request_name(SERVICE_NAME)
+
+        # Register with the StatusNotifierWatcher
+        try:
+            introspection = await bus.introspect(WATCHER_BUS, WATCHER_PATH)
+            proxy = bus.get_proxy_object(WATCHER_BUS, WATCHER_PATH, introspection)
+            watcher = proxy.get_interface("org.kde.StatusNotifierWatcher")
+            await watcher.call_register_status_notifier_item(SERVICE_NAME)
+        except Exception as e:
+            print(f"nightmode: could not register with StatusNotifierWatcher: {e}")
+            print("nightmode: tray icon may not appear (no watcher running?)")
+
+        global tray
+        tray = item
+
+        # Update initial state
+        now = datetime.now().astimezone()
+        temp = calculate_temperature(now, config)
+        active = not forced_off and temp < config["temp_day"]
+        item.update_state(active, f"{temp}K" if not forced_off else "Disabled")
+
+        print("nightmode: tray icon registered")
+        await bus.wait_for_disconnect()
+
+    except Exception as e:
+        print(f"nightmode: tray error: {e}")
+
+
+def update_tray():
+    """Update tray icon state to reflect current mode."""
+    if tray is None:
+        return
+    now = datetime.now().astimezone()
+    temp = calculate_temperature(now, config)
+    if forced_off:
+        tray.update_state(False, "Disabled")
+    else:
+        active = temp < config["temp_day"]
+        tray.update_state(active, f"{temp}K")
+
+
+# =====================================================================
+#  Toggle handler
+# =====================================================================
+
+def do_toggle():
+    """Toggle forced-off state. Applies immediately."""
     global forced_off, last_temp
     forced_off = not forced_off
     if forced_off:
@@ -237,40 +409,23 @@ def handle_toggle(signum, frame):
         last_temp = None
         notify("Disabled")
     else:
-        # Re-apply immediately — don't wait for next tick
         last_temp = None
         now = datetime.now().astimezone()
         temp = calculate_temperature(now, config)
         apply_temperature(temp, config["temp_day"])
         notify(f"Enabled — {temp}K")
+    update_tray()
 
 
 # =====================================================================
 #  Main loop
 # =====================================================================
 
-def get_local_now() -> datetime:
-    """Get current local time with timezone info."""
-    return datetime.now().astimezone()
-
-
-def main():
+async def temperature_loop():
+    """Main loop: update temperature every interval seconds."""
     global forced_off, config
 
-    config = load_config()
-
-    signal.signal(signal.SIGUSR1, handle_toggle)
-
-    # Write PID file so the toggle script can find us
-    pid_file = os.path.join(
-        os.environ.get("XDG_RUNTIME_DIR", "/tmp"),
-        "nightmode.pid"
-    )
-    with open(pid_file, "w") as f:
-        f.write(str(os.getpid()))
-
-    # Log startup
-    now = get_local_now()
+    now = datetime.now().astimezone()
     sunrise, sunset = _sun_calc(now, config["latitude"], config["longitude"])
     temp = calculate_temperature(now, config)
     print(f"nightmode: {config['latitude']}°N, {config['longitude']}°W")
@@ -279,25 +434,65 @@ def main():
     print(f"nightmode: starting at {temp}K")
 
     apply_temperature(temp, config["temp_day"])
+    update_tray()
 
     while True:
-        time_mod.sleep(config["interval"])
+        await asyncio.sleep(config["interval"])
 
         if forced_off:
-            now = get_local_now()
+            now = datetime.now().astimezone()
             sunrise, _ = _sun_calc(now, config["latitude"], config["longitude"])
             now_m = _time_to_minutes(now.time())
             sr_m = _time_to_minutes(sunrise)
             if abs(now_m - sr_m) < 2:
                 forced_off = False
-                config = load_config()  # reload config at sunrise
+                config = load_config()
                 notify("Enabled — sunrise")
+                update_tray()
             else:
                 continue
 
-        now = get_local_now()
+        now = datetime.now().astimezone()
         temp = calculate_temperature(now, config)
         apply_temperature(temp, config["temp_day"])
+        update_tray()
+
+
+async def main_async():
+    """Run temperature loop and tray icon concurrently."""
+    await asyncio.gather(
+        temperature_loop(),
+        run_tray(asyncio.get_event_loop()),
+    )
+
+
+def main():
+    global config
+    config = load_config()
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    # Handle SIGUSR1 for toggle
+    loop.add_signal_handler(signal.SIGUSR1, do_toggle)
+
+    # Write PID file
+    pid_file = os.path.join(
+        os.environ.get("XDG_RUNTIME_DIR", "/tmp"),
+        "nightmode.pid"
+    )
+    with open(pid_file, "w") as f:
+        f.write(str(os.getpid()))
+
+    try:
+        loop.run_until_complete(main_async())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        try:
+            os.unlink(pid_file)
+        except FileNotFoundError:
+            pass
 
 
 if __name__ == "__main__":
