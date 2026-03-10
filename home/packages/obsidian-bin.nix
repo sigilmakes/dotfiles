@@ -80,7 +80,7 @@ stdenv.mkDerivation {
         # Wrap with Wayland flags and gapps env
         makeWrapper $out/opt/obsidian/obsidian $out/bin/obsidian \
             "''${gappsWrapperArgs[@]}" \
-            --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland --enable-wayland-ime=true --wayland-text-input-version=3}}" \
+            --add-flags "--ozone-platform=wayland --enable-wayland-ime=true --wayland-text-input-version=3" \
             --prefix PATH : ${lib.makeBinPath [ xdg-utils ]}
 
         # Install icon from the bundled resources
