@@ -241,8 +241,8 @@
         # Notification sidebar toggle (was swaync)
         bind = $mainMod, slash, exec, caelestia shell drawers toggle sidebar
 
-        # Night mode toggle (hyprsunset)
-        bind = $mainMod, N, exec, pkill hyprsunset || hyprsunset
+        # Night mode toggle (hyprsunset — reset to profile / force identity)
+        bind = $mainMod, N, exec, nightmode.sh
 
         # Next wallpaper (via caelestia)
         bind = $mainMod ALT, W, exec, caelestia wallpaper -r

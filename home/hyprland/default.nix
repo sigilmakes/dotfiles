@@ -41,7 +41,7 @@
     # Packages needed by exec-once entries and keybindings
     home.packages = with pkgs; [
         networkmanagerapplet    # nm-applet WiFi/network tray
-        hyprsunset              # Night mode / blue light filter (Super+N toggle)
+        hyprsunset              # Night mode / blue light filter (Super+N toggle, time-based profiles)
     ];
 
     wayland.windowManager.hyprland = {
@@ -103,6 +103,10 @@
 
                 # Forward bluetooth media commands to MPRIS
                 "mpris-proxy"
+
+                # Night mode — location-aware blue light filter daemon
+                "hyprsunset"
+                "nightmode.py"
 
                 # Caelestia resizer (window auto-resize, e.g. PiP)
                 "caelestia resizer -d"

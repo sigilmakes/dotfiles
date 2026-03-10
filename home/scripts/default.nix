@@ -5,6 +5,8 @@
 # dontkillsteam.sh            — close window, but minimize Steam instead of killing it
 # dualsense.sh                — DualSense controller config menu (triggers, touchpad)
 # windowgroup.sh              — toggle focused window in/out of a group
+# nightmode.sh                — toggle hyprsunset night mode on/off
+# nightmode.py                — location-aware night mode daemon (Warrington, UK)
 
 
 { config, pkgs, lib, ... }:
@@ -39,11 +41,18 @@ let
             for script in *.sh; do
                 install -Dm755 "$script" "$out/bin/$script"
             done
+            for script in *.py; do
+                install -Dm755 "$script" "$out/bin/$script"
+            done
             runHook postInstall
         '';
 
         postFixup = ''
             for script in $out/bin/*.sh; do
+                wrapProgram "$script" \
+                    --prefix PATH : "${lib.makeBinPath runtimeDeps}"
+            done
+            for script in $out/bin/*.py; do
                 wrapProgram "$script" \
                     --prefix PATH : "${lib.makeBinPath runtimeDeps}"
             done
