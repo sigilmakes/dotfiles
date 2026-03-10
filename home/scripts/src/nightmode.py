@@ -350,11 +350,17 @@ async def run_tray(loop: asyncio.AbstractEventLoop):
         def NewToolTip(self):
             pass
 
+    # Stub menu interface so the tray host doesn't get errors probing /NO_DBUSMENU
+    class DbusmenuStub(ServiceInterface):
+        def __init__(self):
+            super().__init__("com.canonical.dbusmenu")
+
     try:
         bus = await MessageBus(bus_type=BusType.SESSION).connect()
 
         item = StatusNotifierItem()
         bus.export(OBJECT_PATH, item)
+        bus.export("/NO_DBUSMENU", DbusmenuStub())
         await bus.request_name(SERVICE_NAME)
 
         # Register with the StatusNotifierWatcher
