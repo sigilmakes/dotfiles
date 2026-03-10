@@ -144,6 +144,9 @@
 
         # Machine-specific source line is in keybindings.nix extraConfig
         # (must come before the submap block).
-        extraConfig = "";
+        extraConfig = ''
+            # Caelestia colour scheme — provides $primary, $surface, etc.
+            source = ~/.config/hypr/scheme/current.conf
+        '';
     };
 }
