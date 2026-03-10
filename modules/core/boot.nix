@@ -41,6 +41,14 @@
     # These are stability/security patches for the CPU itself.
     hardware.cpu.amd.updateMicrocode = true;
 
+    # --- Silent boot ---
+    # Suppress kernel and systemd messages on the console so they don't
+    # clobber greetd/tuigreet on TTY1. Everything is still in `dmesg`
+    # and `journalctl` — this only hides the live console output.
+    boot.consoleLogLevel = 0;
+    boot.initrd.verbose = false;
+    boot.kernelParams = [ "quiet" "udev.log_level=3" ];
+
     # --- zram swap ---
     # Compressed swap in RAM — no disk I/O, basically free.
     # With 128GB RAM this is pure safety net: if GTT is loaded with a

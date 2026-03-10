@@ -46,6 +46,11 @@
         };
     };
 
+    # Delay greetd until all other boot jobs finish.
+    # Without this, systemd status messages print over tuigreet on TTY1.
+    # Type = "idle" means: wait for everything else, then start.
+    systemd.services.greetd.serviceConfig.Type = "idle";
+
     # Install tuigreet so it's available system-wide
     # (greetd needs it at the system level, not per-user)
     environment.systemPackages = [

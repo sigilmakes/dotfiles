@@ -43,6 +43,7 @@
         ../../modules/services/ssh.nix      # SSH daemon (keys only)
         ../../modules/services/docker.nix   # Container runtime (rootless)
         ../../modules/services/printing.nix # CUPS printing
+        ../../modules/services/ollama.nix   # Local LLM inference (ROCm)
     ];
 
     # Hostname for this machine — used by networking, Avahi, etc.
