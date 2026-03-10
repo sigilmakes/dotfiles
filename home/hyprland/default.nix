@@ -158,7 +158,7 @@
                 groupbar {
                     enabled = true
                     font_family = CaskaydiaCove Nerd Font Mono
-                    font_size = 9
+                    font_size = 13
                     height = 24
                     render_titles = true
                     gradients = true
