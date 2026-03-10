@@ -5,7 +5,7 @@
 # normally inside that submap — only the shell-interaction binds changed.
 #
 # WHAT CHANGED vs the old config:
-#   - Super tap AND Super+A open caelestia launcher (was Super+A → rofi)
+#   - Super tap open caelestia launcher
 #   - Super+L → caelestia lock (was swaylock — same key)
 #   - Super+Shift+L → caelestia session menu (was logoutlaunch.sh — same key)
 #   - Screenshots route through caelestia (same keys: P, Shift+P, Alt+P, Print)
