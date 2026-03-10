@@ -28,7 +28,7 @@
             pypy = "pypy3";
             ipy = "ipython";
             fman = "compgen -c | fzf | xargs man";  # fuzzy-find a man page
-            fetch = ''fastfetch --data "$(pokemon-colorscripts -r)"'';
+            fetch = "fastfetch";
             pika = "pokemon-colorscripts";
 
             # Weather
