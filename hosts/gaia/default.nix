@@ -23,6 +23,7 @@
         ../../modules/hardware/gpu-amd.nix  # AMD GPU (RADV + AMDVLK + Mesa)
         # ../../modules/hardware/rocm.nix     # ROCm compute (llama.cpp, ML/AI) + rocm-smi for btop GPU monitoring
         ../../modules/hardware/bluetooth.nix # Bluetooth + Blueman
+        ../../modules/hardware/powercap.nix  # RAPL energy counters readable without sudo
 
         # --- Desktop modules ---
         ../../modules/desktop/hyprland.nix  # Hyprland compositor + Wayland env
