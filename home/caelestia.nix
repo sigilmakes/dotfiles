@@ -143,7 +143,7 @@ let
         };
 
         notifs = {
-            expire = false;
+            expire = true;
             defaultExpireTimeout = 5000;
             actionOnClick = false;
         };
