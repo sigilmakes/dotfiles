@@ -18,6 +18,7 @@
         ripgrep                    # Fast grep alternative (rg)
         fd                         # Fast find alternative
         nix-search-cli             # Fast nixpkgs search via search.nixos.org
+        dust                       # Better du
 
         # --- Fun ---
         fortune                    # Random quotes / wisdom
