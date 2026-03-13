@@ -4,20 +4,29 @@
 # session, media, brightness, screenshots). Regular Hyprland binds work
 # normally inside that submap — only the shell-interaction binds changed.
 #
-# WHAT CHANGED vs the old config:
-#   - Super tap open caelestia launcher
+# WHAT CHANGED vs the old HyDE config:
+#   - Super+A → caelestia launcher (was rofi; Super alone is just a modifier)
 #   - Super+L → caelestia lock (was swaylock — same key)
 #   - Super+Shift+L → caelestia session menu (was logoutlaunch.sh — same key)
+#   - Super+Alt+L → restore lock (restart shell + re-lock, recovery bind)
 #   - Screenshots route through caelestia (same keys: P, Shift+P, Alt+P, Print)
 #   - Media/brightness hardware keys route through caelestia (for OSD)
+#   - Ctrl+Super+Space/=/- → keyboard media controls (no hardware keys needed)
 #   - Volume uses wpctl directly (caelestia shows OSD)
+#   - Super+Shift+M → mute toggle (keyboard shortcut)
 #   - Clipboard uses caelestia/fuzzel (same keys: Super+V, Super+Shift+V)
+#   - Super+Period → emoji picker (caelestia)
 #   - Super+/ toggles caelestia sidebar (was swaync)
+#   - Super+D → caelestia toggle communication (smart special WS for discord)
+#   - Super+M → caelestia toggle music (smart special WS for spotify etc.)
+#   - Ctrl+Super+Backslash → center window
+#   - Super+Alt+Backslash → PiP mode
+#   - Super+Page_Up/Down → workspace ±1
 #
 # WHAT'S THE SAME:
 #   - All window actions (close, float, fullscreen, pin, focus, split, groups)
 #   - All workspace binds (Super+1-0, Shift+1-0, Alt+1-0, Ctrl+arrows, etc.)
-#   - All app launchers (Return, E, F, D, C)
+#   - All app launchers (Return, E, F, C)
 #   - Super+X → dualsense.sh (was quicklaunch2)
 #   - Super+R → caelestia record (was wallbash toggle)
 #   - Super+Shift+T → windowgroup.sh (restored)
@@ -46,21 +55,14 @@
         exec = hyprctl dispatch submap global
         submap = global
 
-        # --- Caelestia launcher (Super tap) ---
-        bindi = Super, Super_L, global, caelestia:launcher
-        bindin = Super, catchall, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:272, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:273, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:274, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:275, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:276, global, caelestia:launcherInterrupt
-        bindin = Super, mouse:277, global, caelestia:launcherInterrupt
-        bindin = Super, mouse_up, global, caelestia:launcherInterrupt
-        bindin = Super, mouse_down, global, caelestia:launcherInterrupt
-        
+        # --- Caelestia launcher (Super+A) ---
+        bind = $mainMod, A, global, caelestia:launcher
+
         # --- Caelestia shell panels ---
         bind = $mainMod, L, global, caelestia:lock
         bind = $mainMod SHIFT, L, global, caelestia:session
+        bindl = $mainMod ALT, L, exec, caelestia shell -d
+        bindl = $mainMod ALT, L, global, caelestia:lock
         bindl = Ctrl+Alt, C, global, caelestia:clearNotifs
 
         # --- Brightness (hardware keys → caelestia OSD) ---
@@ -73,6 +75,11 @@
         bindl = , XF86AudioNext, global, caelestia:mediaNext
         bindl = , XF86AudioPrev, global, caelestia:mediaPrev
         bindl = , XF86AudioStop, global, caelestia:mediaStop
+
+        # --- Media (keyboard shortcuts → caelestia OSD) ---
+        bindl = Ctrl+$mainMod, Space, global, caelestia:mediaToggle
+        bindl = Ctrl+$mainMod, Equal, global, caelestia:mediaNext
+        bindl = Ctrl+$mainMod, Minus, global, caelestia:mediaPrev
 
         # --- Screenshots (same keys, caelestia backend) ---
         bind = $mainMod, P, exec, caelestia screenshot
@@ -134,7 +141,7 @@
         # Mouse bindings
         bindm = $mainMod, mouse:272, movewindow
         bindm = $mainMod, mouse:273, resizewindow
-        bindm = $mainMod, Z, movewindow
+        bind = $mainMod, Z, global, caelestia:dashboard
 
 
         # =================================================================
@@ -159,6 +166,10 @@
 
         # Jump to first empty workspace
         bind = $mainMod CTRL, Down, workspace, empty
+
+        # Workspace navigation with Page keys
+        binde = $mainMod, Page_Up, workspace, -1
+        binde = $mainMod, Page_Down, workspace, +1
 
         # Scroll through workspaces with mouse wheel
         bind = $mainMod, mouse_down, workspace, e+1
@@ -208,7 +219,8 @@
         bind = $mainMod, Return, exec, $terminal
         bind = $mainMod, E, exec, $fileExplorer
         bind = $mainMod, F, exec, $browser
-        bind = $mainMod, D, exec, vesktop
+        bind = $mainMod, D, exec, caelestia toggle communication
+        bind = $mainMod, M, exec, caelestia toggle music
         bind = $mainMod, C, exec, kitty --class ai-assistant --title "AI Assistant" -e pi
         bind = $mainMod SHIFT, C, exec, hyprctl dispatch exec "[float on; size 60% 60%; center on] kitty --class ai-assistant --title 'AI Assistant' -e pi"
         bind = CTRL SHIFT, Escape, exec, kitty --class btop --title btop -e btop
@@ -244,8 +256,15 @@
         # Next wallpaper (via caelestia)
         bind = $mainMod ALT, W, exec, caelestia wallpaper -r
 
+        # Emoji picker
+        bind = $mainMod, Period, exec, pkill fuzzel || caelestia emoji -p
+
         # Colour picker
         bind = $mainMod SHIFT, slash, exec, hyprpicker -a
+
+        # Center window / PiP
+        bind = Ctrl+$mainMod, Backslash, centerwindow, 1
+        bind = $mainMod ALT, Backslash, exec, caelestia resizer pip
 
 
         # =================================================================
@@ -254,6 +273,7 @@
 
         bindl = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
         bindl = , XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+        bindl = $mainMod SHIFT, M, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
         bindle = , XF86AudioRaiseVolume, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
         bindle = , XF86AudioLowerVolume, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
     '';

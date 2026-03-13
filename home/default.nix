@@ -96,6 +96,7 @@
         ./apps/keyring.nix
         ./apps/networking.nix
         ./apps/media.nix
+        ./apps/pear-desktop.nix
         ./apps/utilities.nix
     ];
 }

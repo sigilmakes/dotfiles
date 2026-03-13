@@ -40,13 +40,13 @@
             ktrans = "kitten transfer"; # File transfer between kitty instances
 
             # --- NixOS rebuild shortcuts ---
-            # These invoke nixos-rebuild with the gaia-nix flake.
+            # These invoke nixos-rebuild with the dotfiles flake.
             #   rebuild      → switch: build + activate immediately
             #   rebuild-test → test: activate without adding to boot menu
             #   rebuild-boot → boot: add to boot menu, activate on next reboot
-            rebuild = "sudo nixos-rebuild switch --flake ~/Projects/gaia-nix#gaia";
-            rebuild-test = "sudo nixos-rebuild test --flake ~/Projects/gaia-nix#gaia";
-            rebuild-boot = "sudo nixos-rebuild boot --flake ~/Projects/gaia-nix#gaia";
+            rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles#gaia";
+            rebuild-test = "sudo nixos-rebuild test --flake ~/dotfiles#gaia";
+            rebuild-boot = "sudo nixos-rebuild boot --flake ~/dotfiles#gaia";
 
             # Claude Code
             yolo = "claude --dangerously-skip-permissions";

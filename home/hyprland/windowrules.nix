@@ -64,13 +64,16 @@
         # --- Window rules ---
         windowrule = [
             # Global opacity for non-fullscreen windows
-            "opacity 0.95 override, match:fullscreen false"
+            "opacity 1 0.8 override, match:fullscreen false"
 
             # Apps that should be opaque (native transparency or visual tools)
-            "opaque true, match:class kitty|vesktop|org\\.quickshell|imv|swappy"
+            "opaque true, match:class vesktop|org\\.quickshell|imv|swappy"
 
             # Center floating windows (not XWayland — breaks popups)
             "center true, match:float true, match:xwayland false"
+
+            # Ripdrag
+            "move (cursor_x+((monitor_w*0))) (cursor_y+((monitor_h*0))), match:title ^(ripdrag)$"
 
             # --- Float rules ---
             "float true, match:class yad"
@@ -109,8 +112,9 @@
 
             # --- Special workspace assignments ---
             "workspace special:sysmon, match:class btop"
-            "workspace special:music, match:class Spotify|feishin|Cider"
+            "workspace special:music, match:class Spotify|feishin|Cider|com\\.github\\.th_ch\\.youtube_music"
             "workspace special:music, match:initial_title ^Spotify( Free)?$"
+            "workspace special:communication, match:class vesktop|discord|signal"
 
 
             # --- Picture-in-Picture ---

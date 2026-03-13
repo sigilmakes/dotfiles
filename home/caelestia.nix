@@ -20,6 +20,35 @@
 { config, pkgs, lib, ... }:
 
 let
+    # Default cli.json — seeded once, then owned by the user.
+    # Used by caelestia-cli for toggle workspace configs etc.
+    defaultCliConfig = builtins.toJSON {
+        theme = {
+            enableCava = false;
+        };
+        toggles = {
+            communication = {
+                vesktop = {
+                    enable = true;
+                    match = [{ class = "vesktop"; }];
+                    command = [ "vesktop" ];
+                    move = true;
+                };
+                discord = {
+                    enable = false;
+                };
+            };
+            music = {
+                pear-desktop = {
+                    enable = true;
+                    match = [{ class = "com.github.th_ch.youtube_music"; }];
+                    command = [ "pear-desktop" ];
+                    move = true;
+                };
+            };
+        };
+    };
+
     # Default shell.json — seeded once, then owned by the user.
     defaultConfig = builtins.toJSON {
         appearance = {
@@ -234,6 +263,18 @@ in
             mkdir -p "$config_dir"
             echo '${defaultConfig}' > "$config_file"
             echo "caelestia: seeded default shell.json"
+        fi
+    '';
+
+    # Seed cli.json on first activation only.
+    # Used by caelestia-cli for toggle workspace configs (communication, music, etc.)
+    home.activation.seedCaelestiaCliConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        config_dir="${config.xdg.configHome}/caelestia"
+        config_file="$config_dir/cli.json"
+        if [ ! -f "$config_file" ]; then
+            mkdir -p "$config_dir"
+            echo '${defaultCliConfig}' > "$config_file"
+            echo "caelestia: seeded default cli.json"
         fi
     '';
 
