@@ -33,6 +33,9 @@
         rpcs3                      # PS3 emulator
         pcsx2                      # PS2 emulator
 
+        # --- Mod managers ---
+        r2modman                   # Thunderstore mod manager (Lethal Company, V Rising, etc.)
+
         # --- Open-source engines ---
         openmw                     # Morrowind engine reimplementation
     ];
